@@ -18,7 +18,8 @@ db_constants = setting['DB_Constants']
 
 
 class Database:
-    """Database Class provides all the basic functionality of an Oracle Database. Has the Following functions:
+    """Database Class provides all the basic functionality of an MySQL Database.
+        Has the Following functions:
         -   set_database_connection
         -   get_database_connection
         -   set_cursor
@@ -31,7 +32,7 @@ class Database:
         -   call_procedure
 
     """
-    
+
     # Private variables
     __database_username = None
     __database_password = None

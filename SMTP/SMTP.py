@@ -65,7 +65,6 @@ class Configuration:
     __attachments = None
 
     def __init__(self, mail_config_path=None):
-
         self.config_mail(mail_config_path)
         return None
 
@@ -76,8 +75,7 @@ class Configuration:
         server_config_file_path = config_parser.get(
             Constants.CONFIG_MAIL_HEADER,
             Constants.CONFIG_MAIL_CONFIG_FILE_PATH
-            ).strip('"')
-
+            ).strip('"').lower()
         tree = ET.parse(server_config_file_path)
         root = tree.getroot()
         smtp_server = root.find('SmtpServer').text

@@ -170,6 +170,6 @@ class Database:
 
 def main():
     print("Called as a Main Function - Will Exit !!!")
-
+    
 if __name__ == "__main__":
     main()

@@ -147,7 +147,7 @@ def write_error_log(log_object=None, can_log=True):
                 (default: {None})
         can_log {bool}
             -- Manually set whether to log the message (default: {True})
-
+ 
     Returns:
         [InterProcessCommunicator]
             -- IPC Object which holds basic communication data
