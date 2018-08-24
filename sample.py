@@ -4,6 +4,7 @@ from Generic import Constants as const
 
 import os
 
+
 def main():
     parent_directory = logger.__get_parent_directory(__file__)
     file_name = const.CONFIG_FILE_NAME + const.CONFIG_FILE_EXTENTION

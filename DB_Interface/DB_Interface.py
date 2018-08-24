@@ -1,6 +1,7 @@
 """
 Name        :   DB_Interface
-Usage       :   Allows access to database and provides functionalities within the database
+Usage       :   Allows access to database and provides functionalities
+                within the database
 Reusability :   Completely Reusable
 Author      :   AVM-Automation-SGO
 Created on  :   06/06/2018
@@ -26,8 +27,15 @@ import pyodbc
 import pandas
 
 # Custom Library
-import Constants as const
-from LogProvider import Logger as logger
+from .. import Globals
+
+if(not Globals.setting):
+    Globals.start()
+
+setting = Globals.setting
+logger = setting['Logger']
+ipc_object = setting['IPC_Object']
+db_constants = setting['DB_Constants']
 
 # Constant Variables
 
