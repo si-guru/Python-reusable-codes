@@ -12,18 +12,6 @@ Date        Mod By  Ver     Modification
 08/13/2018  528664  1.00    Initial Code
 """
 
-# Custom Modules
-from .. import Globals
-try:
-    if(not Globals.setting):
-        Globals.start()
-
-    setting = Globals.setting
-    logger = setting['Logger']
-    ipc_object = setting['IPC_Object']
-except Exception as ex:
-    print("Exception when loading globals")
-
 # Python modules
 import os
 import xml.etree.ElementTree as ET
@@ -40,9 +28,27 @@ try:
     from email import encoders
     from email.mime.image import MIMEImage
 except Exception as ex:
-    ipc_object.message = "Error while importing Email Module " + str(ex)
-    logger.write_error_log(ipc_object)
+    print("Exception when loading Modules")
 
+
+# Custom Modules
+from .. import Globals
+
+try:
+    setting = Globals.setting
+except Exception as ex:
+    Globals.start()
+    setting = Globals.setting
+
+logger = setting['Logger']
+db_constants = setting['DB_Constants']
+log_constants = logger.Log_Constants
+ipc_object = Globals.get_ipc_object(__file__)
+ipc_object.data = {}
+bot_name = ipc_object.module
+ipc_object.data['bot_name'] = bot_name
+ipc_object.message = log_constants.INFO_BOT_LOAD
+logger.write_info_log(ipc_object)
 
 class Constants:
     CONFIG_MAIL_HEADER = "Mail_Configuration"
@@ -176,8 +182,11 @@ class MailServer:
 
     def send_mail(self, configuration=None):
 
-        ipc_object.message = "send_mail started"
-        logger.write_info_log(ipc_object)
+        method_name = "SMTP.send_mail()"
+        ipc_object.data['method_name'] = method_name
+        ipc_object.message = log_constants.DEBUG_METHOD_INITIATED
+        logger.write_debug_log(ipc_object=ipc_object)
+
         """ Checks configuration object in MailServer and replaces with
             user provided Configuraiton"""
 
