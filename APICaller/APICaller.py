@@ -10,7 +10,7 @@ Change Log: Recent Modification in TOP
 ---------------------------------------------------------------------------------
 Date        Modified By     Version              Modification
 ---------------------------------------------------------------------------------
-08/10/2018  528664          1.00                 Initial Code
+08/10/2018  DomainBOTS          1.00                 Initial Code
 """
 # python modules
 import sys
