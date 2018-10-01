@@ -8,17 +8,21 @@ except:
 
 from .. import Globals
 
-if(not Globals.setting):
+try:
+    setting = Globals.setting
+except Exception as ex:
     Globals.start()
+    setting = Globals.setting
 
-setting = Globals.setting
 logger = setting['Logger']
-ipc_object = setting['IPC_Object']
-db_constants = setting['DB_Constants']
+ipc_object = Globals.get_ipc_object(__file__)
+convertor = setting['Convertor']
+
+from . import Constants as db_constants
 
 
 class Database:
-    """Database Class provides all the basic functionality of an MySQL Database.
+    """Database Class provides all the basic functionality of an Oracle Database.
         Has the Following functions:
         -   set_database_connection
         -   get_database_connection
@@ -47,42 +51,87 @@ class Database:
     __config_parser = None
     __ipc_object = None
 
-    def __init__(self, config_file):
+    def __init__(self, config_file=None):
+        if(config_file):
+            self.__config_parser = configparser.RawConfigParser()
+            self.__config_parser.read(config_file)
+            self.__database_hostname = self.__config_parser.get(
+                    db_constants.CONFIG_META_HEADER_MYSQL,
+                    db_constants.CONFIG_META_DATA_DB_HOSTNAME
+                    )
+            self.__database_username = self.__config_parser.get(
+                    db_constants.CONFIG_META_HEADER_MYSQL,
+                    db_constants.CONFIG_META_DATA_DB_USERNAME
+                    )
+            password = self.__config_parser.get(
+                    db_constants.CONFIG_META_HEADER_MYSQL,
+                    db_constants.CONFIG_META_DATA_DB_PASSWORD
+                    )
+            try:
+                self.__database_password = base64.b32decode(password).decode()
+            except:
+                self.__database_password = password
+            self.__database_port = self.__config_parser.get(
+                    db_constants.CONFIG_META_HEADER_MYSQL,
+                    db_constants.CONFIG_META_DATA_DB_PORT
+                    )
+            self.__database_name = self.__config_parser.get(
+                    db_constants.CONFIG_META_HEADER_MYSQL,
+                    db_constants.CONFIG_META_DATA_DB_NAME
+                    )
+            self.__host_domain = self.__config_parser.get(
+                    db_constants.CONFIG_META_HEADER_MYSQL,
+                    db_constants.CONFIG_META_DATA_HOST_DOMAIN
+                    )
 
-        self.__config_parser = configparser.RawConfigParser()
-        self.__config_parser.read(config_file)
-        self.__database_hostname = self.__config_parser.get(
-                db_constants.CONFIG_META_HEADER_MYSQL,
-                db_constants.CONFIG_META_DATA_DB_HOSTNAME
-                )
-        self.__database_username = self.__config_parser.get(
-                db_constants.CONFIG_META_HEADER_MYSQL,
-                db_constants.CONFIG_META_DATA_DB_USERNAME
-                )
-        password = self.__config_parser.get(
-                db_constants.CONFIG_META_HEADER_MYSQL,
-                db_constants.CONFIG_META_DATA_DB_PASSWORD
-                )
-        try:
-            self.__database_password = (base64.b64decode(password)).decode()
-        except:
-            self.__database_password = password
-        self.__database_port = self.__config_parser.get(
-                db_constants.CONFIG_META_HEADER_MYSQL,
-                db_constants.CONFIG_META_DATA_DB_PORT
-                )
-        self.__database_name = self.__config_parser.get(
-                db_constants.CONFIG_META_HEADER_MYSQL,
-                db_constants.CONFIG_META_DATA_DB_NAME
-                )
-        self.__host_domain = self.__config_parser.get(
-                db_constants.CONFIG_META_HEADER_MYSQL,
-                db_constants.CONFIG_META_DATA_HOST_DOMAIN
-                )
-
-        self.connect_database()
+            self.connect_database()
         self.set_ipc_object(ipc_object)
         return None
+
+    def set_database_username(self, username):
+        self.__database_username = username
+
+    def get_database_username(self):
+        return self.__database_username
+
+    def set_database_password(self, password):
+        try:
+            self.__database_password = (base64.b32decode(password)).decode()
+        except:
+            self.__database_password = password
+
+    def get_database_password(self):
+        return self.__database_password
+
+    def set_database_hostname(self, hostname):
+        self.__database_hostname = hostname
+
+    def get_database_hostname(self):
+        return self.__database_hostname
+
+    def set_database_port(self, database_port):
+        self.__database_port = database_port
+
+    def get_database_port(self):
+        return self.__database_port
+
+    def set_database_name(self, database_name):
+        self.__database_name = database_name
+
+    def get_database_name(self):
+        return self.__database_name
+
+    def set_host_domain(self, host_domain):
+        self.__host_domain = host_domain
+
+    def get_host_domain(self):
+        return self.__host_domain
+
+    def set_database_dsn(self, database_dsn):
+        self.__database_dsn = database_dsn
+
+    def get_database_dsn(self):
+        return self.__database_dsn
 
     def set_database_connection(self, connection):
         self.__database_connection = connection
@@ -144,8 +193,8 @@ class Database:
 
     def run_query_from_file(self, file_name=None, proc_name=None,
         arguments=None):
-        file_name = os.path.join(logger.__get_parent_directory(__file__),
-            file_name)
+        parent_directory = logger.__get_parent_directory(__file__)
+        file_name = os.path.join(parent_directory, file_name)
 
         try:
             result = False
